@@ -252,13 +252,20 @@ export function AppProvider({ children }: { children: ReactNode }) {
     // await refreshData();
   };
 
-  const addMenuItem = async (item: MenuItem) => {
-    const res = await fetch(api("/api/menu"), { method: "POST", headers, body: JSON.stringify(item) });
-    if (!res.ok) {
-      const j = await res.json().catch(() => ({} as any));
-      throw new Error(j?.error || "Thêm món thất bại");
-    }
-  };
+const addMenuItem = async (item: MenuItem) => {
+  const res = await fetch(api("/api/menu"), {
+    method: "POST",
+    headers,
+    body: JSON.stringify(item),
+  });
+
+  if (!res.ok) {
+    const j = await res.json().catch(() => ({} as any));
+    throw new Error(j?.error || "Thêm món thất bại");
+  }
+
+  await refreshData();
+};
 
   const updateMenuItem = async (item: MenuItem) => {
     const res = await fetch(api(`/api/menu/${item.id}`), {
