@@ -1,16 +1,41 @@
-export type StoreStatus = "OPEN" | "CLOSED" | "CLOSING_SOON";
+// src/lib/types.ts
+export type StoreStatus = "OPEN" | "CLOSING_SOON" | "CLOSED";
+
+/**
+ * OrderStatus:
+ * - NEW: mới đặt, cần xác nhận
+ * - CONFIRMED: đã xác nhận, đang làm/đang chờ giao
+ * - DONE: đã hoàn thành (giao xong / khách nhận xong)
+ * - REJECTED: từ chối
+ */
+export type OrderStatus = "NEW" | "CONFIRMED" | "DONE" | "REJECTED";
+
+export type PaymentMethod = "CASH" | "TRANSFER";
 
 export interface Store {
-  // ✅ thêm để multi-shop chuẩn
   id?: string;
   slug?: string;
 
   name: string;
   closingTime: string;
   status: StoreStatus;
+  bankInfo?: string;
 
-  // ✅ để tránh undefined lằng nhằng
-  bankInfo: string;
+  /**
+   * Branding (optional)
+   * - logoUrl: ảnh đại diện quán
+   * - bannerUrl: ảnh banner quán
+   *
+   * Có thể là URL http(s) hoặc dataURL (base64).
+   */
+  logoUrl?: string;
+  bannerUrl?: string;
+
+  /**
+   * QR chuyển khoản (optional)
+   * Có thể là URL http(s) hoặc dataURL (base64).
+   */
+  transferQrUrl?: string;
 }
 
 export interface MenuItem {
@@ -19,6 +44,14 @@ export interface MenuItem {
   price: number;
   isAvailable: boolean;
   imageUrl?: string;
+
+  /**
+   * Inventory (optional)
+   * - stockQty: tổng số lượng tồn (không bắt buộc). undefined = không dùng tồn kho
+   * - unit: đơn vị (không bắt buộc): bát/chén/quả/kg...
+   */
+  stockQty?: number;
+  unit?: string;
 }
 
 export interface OrderItem {
@@ -26,22 +59,37 @@ export interface OrderItem {
   quantity: number;
   price: number;
   name: string;
-}
 
-export type OrderStatus = "NEW" | "CONFIRMED" | "REJECTED";
-export type PaymentMethod = "CASH" | "TRANSFER";
+  // ✅ (nếu bạn đã thêm ở bước trước)
+  note?: string;
+}
 
 export interface Order {
   id: string;
+  shopId?: string;
+
   customerPhone: string;
+
+  /**
+   * Optional: khách có thể không chọn giờ nhận.
+   * Nếu rỗng thì UI/Server vẫn chấp nhận.
+   */
   receiveTime: string;
+
+  /**
+   * Required (UI đã bắt buộc).
+   */
   receiveLocation: string;
-  note: string;
-  items: OrderItem[];
+
+  note?: string;
+
   status: OrderStatus;
-  createdAt: number;
   totalPrice: number;
+  createdAt: number;
+
   paymentMethod: PaymentMethod;
+
+  items: OrderItem[];
 }
 
 export interface AppState {
