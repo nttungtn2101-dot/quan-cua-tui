@@ -29,8 +29,8 @@ jobs:
             echo "Install packages"
             npm install
 
-echo "Build frontend"
-npm run build
+            echo "Build frontend"
+            npm run build
 
             echo "Restart PM2"
             pm2 restart quan-cua-tui
